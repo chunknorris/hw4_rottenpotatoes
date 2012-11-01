@@ -34,6 +34,7 @@ class MoviesController < ApplicationController
       redirect_to :sort => sort, :ratings => @selected_ratings and return
     end
     @movies = Movie.find_all_by_rating(@selected_ratings.keys, ordering)
+    p @movies
   end
 
   def new
@@ -48,20 +49,32 @@ class MoviesController < ApplicationController
 
   def edit
     @movie = Movie.find params[:id]
+    p @movie
   end
 
   def update
     @movie = Movie.find params[:id]
+    p @movie
     @movie.update_attributes!(params[:movie])
     flash[:notice] = "#{@movie.title} was successfully updated."
     redirect_to movie_path(@movie)
   end
 
   def destroy
-    @movie = Movie.find(params[:id])
-    @movie.destroy
-    flash[:notice] = "Movie '#{@movie.title}' deleted."
-    redirect_to movies_path
+    # @movie = Movie.find(params[:id])
+    # @movie.destroy
+    # flash[:notice] = "Movie '#{@movie.title}' deleted."
+    # redirect_to movies_path
   end
 
+  def related
+    @movies = Movie.find_related_movies(params[:id])
+    p @movies
+    if !@movies
+      movie = Movie.find(params[:id])
+      p movie
+      flash[:notice] = "'#{movie.title}' has no director info."
+      redirect_to movies_path and return
+    end
+  end
 end
